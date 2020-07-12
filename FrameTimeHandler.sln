@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrameTimeHandler", "FrameTimeHandler\FrameTimeHandler.csproj", "{8DB63CA4-F8E7-41F7-8D7D-151837B33DCF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "submodules", "submodules", "{85A03EEB-10DB-4923-8EE9-168B154C1336}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PythonInterop", "PythonInterop\PythonInterop\PythonInterop.csproj", "{B0FB2731-E9B2-4FC6-841E-ADDD81A8CC6E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +19,16 @@ Global
 		{8DB63CA4-F8E7-41F7-8D7D-151837B33DCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DB63CA4-F8E7-41F7-8D7D-151837B33DCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DB63CA4-F8E7-41F7-8D7D-151837B33DCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0FB2731-E9B2-4FC6-841E-ADDD81A8CC6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0FB2731-E9B2-4FC6-841E-ADDD81A8CC6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0FB2731-E9B2-4FC6-841E-ADDD81A8CC6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0FB2731-E9B2-4FC6-841E-ADDD81A8CC6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B0FB2731-E9B2-4FC6-841E-ADDD81A8CC6E} = {85A03EEB-10DB-4923-8EE9-168B154C1336}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7E746396-99B2-43D9-B028-366EBD3E1D19}

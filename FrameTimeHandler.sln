@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30225.117
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrameTimeHandler", "FrameTimeHandler\FrameTimeHandler.csproj", "{8DB63CA4-F8E7-41F7-8D7D-151837B33DCF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8DB63CA4-F8E7-41F7-8D7D-151837B33DCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DB63CA4-F8E7-41F7-8D7D-151837B33DCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DB63CA4-F8E7-41F7-8D7D-151837B33DCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DB63CA4-F8E7-41F7-8D7D-151837B33DCF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7E746396-99B2-43D9-B028-366EBD3E1D19}
+	EndGlobalSection
+EndGlobal

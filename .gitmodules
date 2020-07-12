@@ -1,0 +1,6 @@
+[submodule "ftanlzer"]
+	path = ftanlzer
+	url = https://github.com/FlexxxerAlex/ftanlzer
+[submodule "PythonInterop"]
+	path = PythonInterop
+	url = https://github.com/FlexxxerAlex/PythonInterop

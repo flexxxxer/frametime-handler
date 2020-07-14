@@ -1,12 +1,19 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="clr-namespace:FrameTimeHandler.ViewModels;assembly=FrameTimeHandler"
-        xmlns:converters="clr-namespace:FrameTimeHandler.ViewModels.Converters;assembly=FrameTimeHandler"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:FrameTimeHandler.ViewModels;assembly=FrameTimeHandler"
+		
+        xmlns:converters="clr-namespace:FrameTimeHandler.ViewModels.Converters;assembly=FrameTimeHandler"
+        xmlns:cp="clr-namespace:ThemeEditor.Controls.ColorPicker;assembly=ThemeEditor.Controls.ColorPicker"
+		
+		Background="{DynamicResource ThemeBackgroundBrush}"
+        TextBlock.Foreground="{DynamicResource ThemeForegroundBrush}"
+        TextBlock.FontSize="{DynamicResource FontSizeNormal}"
+		
         x:Class="FrameTimeHandler.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="FrameTimeHandler"
+        Title="FrameTime Handler"
 		WindowStartupLocation="Manual"
 		mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="300"
 		Width="800"
@@ -20,6 +27,7 @@
 
 	<Window.Resources>
 		<converters:EnumBooleanConverter x:Key="enumBooleanConverter" />
+		<converters:ColorToBrushConverter x:Key="colorToBrushConverter"/>
 	</Window.Resources>
 
 	<Grid>
@@ -36,15 +44,21 @@
 			<RowDefinition/>
 		</Grid.RowDefinitions>
 
-		<Grid Grid.Row="1" Grid.Column="0" x:Name="FileSelectGrid" HorizontalAlignment="Center">
-			<Grid VerticalAlignment="Center">
+		<Grid Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+			<Grid.RowDefinitions>
+				<RowDefinition/>
+				<RowDefinition Height="15"/>
+				<RowDefinition/>
+			</Grid.RowDefinitions>
+			
+			<Grid VerticalAlignment="Bottom">
 				<Grid.RowDefinitions>
 					<RowDefinition/>
 					<RowDefinition/>
 					<RowDefinition/>
 				</Grid.RowDefinitions>
 
-				<TextBlock HorizontalAlignment="Left" Text="Frametime log file:" FontWeight="Bold"/>
+				<TextBlock HorizontalAlignment="Center" Text="Frametime log file:" FontWeight="Bold"/>
 
 				<Grid IsVisible="{Binding IsFileSelected}" Grid.Row="1" Grid.RowSpan="2">
 					<Grid.ColumnDefinitions>
@@ -53,55 +67,73 @@
 					</Grid.ColumnDefinitions>
 
 					<TextBlock Grid.Column="0" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding FilePath}"/>
-					<Button Grid.Column="1" Content="Clear" Margin="10 0 0 0" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding UnselectFileCommand}"/>
+					<Button Grid.Column="1" Content="Clear" Margin="5 0 0 0" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding UnselectFileCommand}"/>
 				</Grid>
 				
 				<Button Grid.Row="2" Content="Select file" VerticalAlignment="Center" HorizontalAlignment="Center" IsVisible="{Binding !IsFileSelected}" Command="{Binding SelectFileCommand}"/>
 			</Grid>
+			
+			<Grid Grid.Row="2" x:Name="ProgramSelectGrid" VerticalAlignment="Top">
+				<Grid VerticalAlignment="Center">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+
+					<TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" FontWeight="Bold" Text="Program that created the logs"/>
+					<ComboBox SelectedIndex="0" HorizontalAlignment="Left" Margin="10 0 0 0" Grid.Column="1" Items="{Binding LogCreationPrograms}" SelectedItem="{Binding SelectedProgram}"/>
+				</Grid>
+			</Grid>
 		</Grid>
 
-		<Grid Grid.Row="1" Grid.Column="2" x:Name="ProgramSelectGrid">
-			<Grid VerticalAlignment="Center">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition/>
-					<ColumnDefinition/>
-				</Grid.ColumnDefinitions>
-
-				<TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" FontWeight="Bold" Text="Program that created the logs"/>
-				<ComboBox SelectedIndex="0" HorizontalAlignment="Left" Margin="10 0 0 0" Grid.Column="1" Items="{Binding LogCreationPrograms}" SelectedItem="{Binding SelectedProgram}"/>
-			</Grid>
+		<Grid Grid.Row="1" Grid.Column="2" VerticalAlignment="Center">
+			<StackPanel>
+				<TextBlock FontWeight="Bold" Text="Select chart types to save:" TextWrapping="Wrap"/>
+				<CheckBox IsChecked="{Binding IsFrametimingGraphNeeded}">
+					<TextBlock Text="Frame timing graph" TextWrapping="Wrap"/>
+				</CheckBox>
+				<CheckBox IsChecked="{Binding IsProbabilityDensityGraphNeeded}">
+					<TextBlock Text="Probability density graph" TextWrapping="Wrap"/>
+				</CheckBox>
+				<CheckBox IsChecked="{Binding IsProbabilityDistributionGraphNeeded}">
+					<TextBlock Text="Probability distribution graph" TextWrapping="Wrap"/>
+				</CheckBox>
+			</StackPanel>
 		</Grid>
 
 		<Grid Grid.Row="1" Grid.Column="4" x:Name="OutputFileProgramTypeSelectGrid">
 			<Grid VerticalAlignment="Center">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition/>
-				</Grid.ColumnDefinitions>
 				<Grid.RowDefinitions>
 					<RowDefinition/>
+					<RowDefinition Height="10"/>
+					<RowDefinition/>
+					<RowDefinition Height="10"/>
 					<RowDefinition/>
 				</Grid.RowDefinitions>
 
 				<StackPanel Grid.Row="0">
-					<TextBlock FontWeight="Bold" Text="Select chart types to save:"/>
-					<CheckBox Content="Frame timing graph" IsChecked="{Binding IsFrametimingGraphNeeded}" />
-					<CheckBox Content="Probability density graph" IsChecked="{Binding IsProbabilityDensityGraphNeeded}"/>
-					<CheckBox Content="Probability distribution graph" IsChecked="{Binding IsProbabilityDistributionGraphNeeded}"/>
+					<TextBlock FontWeight="Bold" Text="Select chart types to save:" TextWrapping="Wrap"/>
+					<RadioButton Margin="0 1 0 1" GroupName="ProgramsThatReadOutputGroup" Content="None" IsChecked="{Binding Path=ProgramThatReadOutput, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None, Mode=TwoWay}"/>
+					<RadioButton Margin="0 1 0 0" GroupName="ProgramsThatReadOutputGroup" Content="Graph" IsChecked="{Binding Path=ProgramThatReadOutput, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Graph, Mode=TwoWay}"/>
 				</StackPanel>
 
-				<StackPanel Grid.Row="1" Margin="0 10 0 0">
-					<TextBlock FontWeight="Bold" Text="Select chart types to save:"/>
-					<RadioButton GroupName="ProgramsThatReadOutputGroup" Content="None" IsChecked="{Binding Path=ProgramThatReadOutput, Converter={StaticResource enumBooleanConverter}, ConverterParameter=None, Mode=TwoWay}"/>
-					<RadioButton GroupName="ProgramsThatReadOutputGroup" Content="Graph" IsChecked="{Binding Path=ProgramThatReadOutput, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Graph, Mode=TwoWay}"/>
+				<StackPanel Orientation="Horizontal" Grid.Row="2">
+					<TextBlock FontSize="12" Text="Graph color:"/>
 
-					<Grid Margin="0 10 0 0" IsVisible="{Binding Path=ProgramThatReadOutput, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Graph}">
-						<TextBlock FontWeight="Bold" Text="Advanced Graph parameters"/>
-						
-					</Grid>
-					
+					<Button BorderThickness="0" Command="{Binding ChangeCustomColorCommand}" Width="25" Margin="5 0 0 0" x:Name="ChangeColorButton" Background="{Binding CustomColor, Converter={StaticResource colorToBrushConverter}}, Mode=TwoWay"/>
+
+					<Popup Width="400" Height="200" IsOpen="{Binding IsChangingColor}" PlacementTarget="{Binding ElementName=CustomColorRectangle}">
+						<cp:ColorPicker x:Name="customColorPicker" Color="{Binding CustomColor, Mode=TwoWay}"/>
+					</Popup>
 					
 				</StackPanel>
-				
+
+				<StackPanel Orientation="Horizontal" Grid.Row="4">
+					<CheckBox VerticalAlignment="Center">
+						<TextBlock Text="Append"/>
+					</CheckBox>
+					<Button Command="{Binding SaveGraphsCommand}" Margin="10 0 0 0" Grid.Row="2" Content="Save" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+				</StackPanel>
 			</Grid>
 		</Grid>
 	</Grid>

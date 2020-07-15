@@ -7,7 +7,7 @@ using Avalonia.Media;
 
 namespace FrameTimeHandler.ViewModels.Converters
 {
-    class ColorToBrushConverter : IValueConverter
+    public class ColorToBrushConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

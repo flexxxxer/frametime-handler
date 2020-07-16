@@ -178,7 +178,7 @@
 				</Grid>
 
 				<StackPanel Orientation="Horizontal" Grid.Row="4">
-					<CheckBox VerticalAlignment="Center">
+					<CheckBox VerticalAlignment="Center" IsChecked="{Binding IsAppend, Mode=TwoWay}">
 						<TextBlock Text="Append"/>
 					</CheckBox>
 					<Button Command="{Binding SaveGraphsCommand}" Margin="10 0 0 0" Grid.Row="2" Content="Save" VerticalAlignment="Center" HorizontalAlignment="Left"/>

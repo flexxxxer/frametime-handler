@@ -1,21 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Joins;
-using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Controls.Shapes;
 using ReactiveUI;
 using DynamicData;
 
 using FrameTimeHandler.FTAnlzerInterop;
 using FrameTimeHandler.GraphsExport;
-
+using MessageBox.Avalonia;
 using Color = Avalonia.Media.Color;
 
 namespace FrameTimeHandler.ViewModels
@@ -66,7 +63,7 @@ namespace FrameTimeHandler.ViewModels
 
         public ObservableCollection<string> LogCreationPrograms { get; set; } = new ObservableCollection<string>();
 
-        private string _selectedProgram;
+        private string _selectedProgram = "";
         public string SelectedProgram
         {
             get => _selectedProgram;
@@ -240,6 +237,21 @@ namespace FrameTimeHandler.ViewModels
             }
         }
 
+        private bool _isAppend = false;
+
+        public bool IsAppend
+        {
+            get => _isAppend;
+            set
+            {
+                if (_isAppend != value)
+                {
+                    _isAppend = value;
+                    this.RaisePropertyChanged(nameof(IsAppend));
+                }
+            }
+        }
+
         public bool IsNeededGraphsColorsUnique
         {
             get
@@ -308,7 +320,32 @@ namespace FrameTimeHandler.ViewModels
 
             SaveGraphsCommand = ReactiveCommand.Create(() =>
             {
+                IEnumerable<(GraphTypes graphType, Color color)> NeededGraphs()
+                {
+                    if (IsFrametimingGraphNeeded)
+                        yield return (GraphTypes.FrameTiming, FrameTimingGraphColor);
 
+                    if (IsProbabilityDensityGraphNeeded)
+                        yield return (GraphTypes.ProbabilityDensity, ProbabilityDensityGraphColor);
+
+                    if (IsProbabilityDistributionGraphNeeded)
+                        yield return (GraphTypes.ProbabilityDistribution, ProbabilityDistributionGraphColor);
+                }
+
+                var (graphData, error) = FTAnlzer.GetGraphsData(FilePath, SelectedProgram, NeededGraphs());
+
+                if (!string.IsNullOrEmpty(error))
+                {
+                    var errorMessage = MessageBoxManager.GetMessageBoxStandardWindow("Error", $"Something went wrong. Check if arguments are valid. Error: {Environment.NewLine}{Environment.NewLine}{error}");
+                    
+                    errorMessage.ShowDialog(
+                        (Application.Current.ApplicationLifetime as ClassicDesktopStyleApplicationLifetime)
+                        ?.MainWindow);
+
+                    return;
+                }
+
+                GraphExporter.Export(GraphsFilePath, TestName, ProgramThatReadOutput, IsAppend, graphData);
 
             }, this.WhenAnyValue(
                 vm => vm.IsFileSelected, 

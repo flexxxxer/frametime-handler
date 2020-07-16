@@ -3,6 +3,11 @@
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<InvariantGlobalization>true</InvariantGlobalization>
+		<ApplicationIcon>Assets\fth-logo.ico</ApplicationIcon>
+		<Version>0.1</Version>
+		<Description>frame time graph creation tool</Description>
+		<PackageProjectUrl>https://github.com/FlexxxerAlex/frametime-handler</PackageProjectUrl>
+		<PackageIcon>fth-logo.ico</PackageIcon>
 	</PropertyGroup>
 	<ItemGroup>
 		<AvaloniaResource Include="Assets\**" />
@@ -17,6 +22,12 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\PythonInterop\PythonInterop\PythonInterop.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="Assets\fth-logo.ico">
+	    <Pack>True</Pack>
+	    <PackagePath></PackagePath>
+	  </None>
 	</ItemGroup>
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
 	  <Exec Command="if $(ConfigurationName) == Debug (&#xD;&#xA;     cd $(SolutionDir)&#xD;&#xA;&#xD;&#xA;     Xcopy ftanlzer $(TargetDir)ftanlzer\ /K /D /H /Y /s /e&#xD;&#xA;)" />

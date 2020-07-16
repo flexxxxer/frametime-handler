@@ -301,10 +301,14 @@ namespace FrameTimeHandler.ViewModels
                 var fileDialog = new OpenFileDialog()
                 {
                     AllowMultiple = false,
-                    Directory = Directory.GetCurrentDirectory()
                 };
 
                 string[] results = await fileDialog.ShowAsync((Application.Current.ApplicationLifetime as ClassicDesktopStyleApplicationLifetime)?.MainWindow);
+
+                if (results is null)
+                {
+                    return;
+                }
 
                 string selectedFile = results.FirstOrDefault(r => string.IsNullOrEmpty(r) is false);
 

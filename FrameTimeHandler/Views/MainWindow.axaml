@@ -12,7 +12,7 @@
         TextBlock.FontSize="{DynamicResource FontSizeNormal}"
 		
         x:Class="FrameTimeHandler.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/fth-logo.ico"
         Title="FrameTime Handler"
 		WindowStartupLocation="Manual"
 		mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="300"

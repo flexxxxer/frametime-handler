@@ -379,6 +379,11 @@ namespace FrameTimeHandler.ViewModels
 
                 string[] results = await fileDialog.ShowAsync((Application.Current.ApplicationLifetime as ClassicDesktopStyleApplicationLifetime)?.MainWindow);
 
+                if (results is null || results.Length == 0)
+                {
+                    return;
+                }
+
                 string selectedFile = results.FirstOrDefault(r => string.IsNullOrEmpty(r) is false);
                 
                 if (!string.IsNullOrEmpty(selectedFile))

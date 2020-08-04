@@ -15,7 +15,7 @@
         Icon="/Assets/fth-logo.ico"
         Title="FrameTime Handler"
 		WindowStartupLocation="Manual"
-		mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="300"
+		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="400"
 		Width="800"
 		Height="400"
 		MinWidth="450"
@@ -28,6 +28,7 @@
 	<Window.Resources>
 		<converters:EnumBooleanConverter x:Key="enumBooleanConverter" />
 		<converters:ColorToBrushConverter x:Key="colorToBrushConverter"/>
+		<converters:InverseBooleanConverter x:Key="inverseBooleanConverter"/>
 	</Window.Resources>
 
 	<Grid>
@@ -46,6 +47,8 @@
 
 		<Grid Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
 			<Grid.RowDefinitions>
+				<RowDefinition/>
+				<RowDefinition Height="15"/>
 				<RowDefinition/>
 				<RowDefinition Height="15"/>
 				<RowDefinition/>
@@ -84,6 +87,27 @@
 					<ComboBox SelectedIndex="0" HorizontalAlignment="Left" Margin="10 0 0 0" Grid.Column="1" Items="{Binding LogCreationPrograms}" SelectedItem="{Binding SelectedProgram}"/>
 				</Grid>
 			</Grid>
+
+			<Grid Grid.Row="4" IsVisible="{Binding IsSelectedProgramCorrect}">
+				<StackPanel>
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Text="0.1%:"/>
+						<TextBlock Text="{Binding Statistics.Occation01}"/>
+					</StackPanel>
+					<StackPanel Orientation="Horizontal">
+
+					</StackPanel>
+					<StackPanel Orientation="Horizontal">
+
+					</StackPanel>
+					<StackPanel Orientation="Horizontal">
+
+					</StackPanel>
+					<StackPanel Orientation="Horizontal">
+
+					</StackPanel>
+				</StackPanel>
+			</Grid>
 		</Grid>
 
 		<Grid Grid.Row="1" Grid.Column="2" VerticalAlignment="Center">
@@ -95,60 +119,125 @@
 
 			<StackPanel HorizontalAlignment="Center">
 				<TextBlock FontWeight="Bold" Text="Select chart types to save:" TextWrapping="Wrap"/>
-				<StackPanel Orientation="Horizontal">
-					<CheckBox x:Name="IsFrametimingGraphNeededCheckBox" IsChecked="{Binding IsFrametimingGraphNeeded}">
-						<TextBlock Text="Frame timing graph" TextWrapping="Wrap"/>
-					</CheckBox>
-					<Button x:Name="ChangeFrameTimingGraphColorButton" BorderThickness="0" IsVisible="{Binding ElementName=IsFrametimingGraphNeededCheckBox, Path=IsChecked}" Command="{Binding ChangeFrameTimingGraphColorCommand}" Width="25" Margin="5 0 0 0" Background="{Binding Path=FrameTimingGraphColor, Converter={StaticResource colorToBrushConverter}, Mode=TwoWay}"/>
-				</StackPanel>
-				<StackPanel Orientation="Horizontal">
-					<CheckBox x:Name="IsProbabilityDensityGraphNeededCheckBox" IsChecked="{Binding IsProbabilityDensityGraphNeeded}">
-						<TextBlock Text="Probability density graph" TextWrapping="Wrap"/>
-					</CheckBox>
-					<Button x:Name="ChangeProbabilityDensityGraphColorButton" BorderThickness="0" IsVisible="{Binding ElementName=IsProbabilityDensityGraphNeededCheckBox, Path=IsChecked}" Command="{Binding ChangeProbabilityDensityGraphColorCommand}" Width="25" Margin="5 0 0 0" Background="{Binding Path=ProbabilityDensityGraphColor, Converter={StaticResource colorToBrushConverter}, Mode=TwoWay}"/>
-				</StackPanel>
-				<StackPanel Orientation="Horizontal">
-					<CheckBox x:Name="IsProbabilityDistributionGraphNeededCheckBox" IsChecked="{Binding IsProbabilityDistributionGraphNeeded}">
-						<TextBlock Text="Probability distribution graph" TextWrapping="Wrap"/>
-					</CheckBox>
-					<Button x:Name="ChangeProbabilityDistributionGraphColorButton" BorderThickness="0" IsVisible="{Binding ElementName=IsProbabilityDistributionGraphNeededCheckBox, Path=IsChecked}" Command="{Binding ChangeProbabilityDistributionGraphColorCommand}" Width="25" Margin="5 0 0 0" Background="{Binding Path=ProbabilityDistributionGraphColor, Converter={StaticResource colorToBrushConverter}, Mode=TwoWay}"/>
+				<StackPanel x:Name="FrameTimingGraphOptions" Margin="0 0 0 5">
+					<StackPanel Orientation="Horizontal">
+						<CheckBox x:Name="IsFrametimingGraphNeededCheckBox" IsChecked="{Binding IsFrametimingGraphNeeded}">
+							<TextBlock Text="Frame timing graph" TextWrapping="Wrap"/>
+						</CheckBox>
+						<Button x:Name="ChangeFrameTimingGraphColorButton" BorderThickness="0" IsVisible="{Binding ElementName=IsFrametimingGraphNeededCheckBox, Path=IsChecked}" Command="{Binding ChangeFrameTimingGraphColorCommand}" Width="25" Margin="5 0 0 0" Background="{Binding Path=FrameTimingGraphColor, Converter={StaticResource colorToBrushConverter}, Mode=TwoWay}"/>
+					</StackPanel>
+					<Grid Grid.Row="1" Grid.RowSpan="2">
+						<Grid.IsVisible>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="IsFrametimingGraphNeeded" Mode="TwoWay"/>
+								<Binding Path="IsFrametimingGraphFileSelected" Mode="TwoWay"/>
+							</MultiBinding>
+						</Grid.IsVisible>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition/>
+							<ColumnDefinition/>
+						</Grid.ColumnDefinitions>
+
+						<TextBlock Grid.Column="0" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding FrametimingGraphFilePath}"/>
+						<Button Grid.Column="1" Content="Clear" Margin="5 0 0 0" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding UnselectFrametimingGraphFileCommand}"/>
+					</Grid>
+
+					<Grid>
+						<Button.IsVisible>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="IsFrametimingGraphNeeded" Mode="TwoWay"/>
+								<Binding Path="!IsFrametimingGraphFileSelected" Mode="TwoWay"/>
+							</MultiBinding>
+						</Button.IsVisible>
+
+						<Button Grid.Row="2" Content="Select file" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding SelectFrametimingGraphFileCommand}"/>
+					</Grid>
+					
 				</StackPanel>
 
-				<Popup Width="400" Height="200" IsOpen="{Binding IsFrameTimingGraphChangingColor}" PlacementTarget="{Binding ElementName=ChangeFrameTimingGraphColorButton}">
+				<StackPanel x:Name="ProbabilityDensityGraphOptions" Margin="0 0 0 5">
+					<StackPanel Orientation="Horizontal">
+						<CheckBox x:Name="IsProbabilityDensityGraphNeededCheckBox" IsChecked="{Binding IsProbabilityDensityGraphNeeded}">
+							<TextBlock Text="Probability density graph" TextWrapping="Wrap"/>
+						</CheckBox>
+						<Button x:Name="ChangeProbabilityDensityGraphColorButton" BorderThickness="0" IsVisible="{Binding ElementName=IsProbabilityDensityGraphNeededCheckBox, Path=IsChecked}" Command="{Binding ChangeProbabilityDensityGraphColorCommand}" Width="25" Margin="5 0 0 0" Background="{Binding Path=ProbabilityDensityGraphColor, Converter={StaticResource colorToBrushConverter}, Mode=TwoWay}"/>
+					</StackPanel>
+					<Grid Grid.Row="1" Grid.RowSpan="2">
+						<Grid.IsVisible>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="IsProbabilityDensityGraphNeeded" Mode="TwoWay"/>
+								<Binding Path="IsProbabilityDensityGraphFileSelected" Mode="TwoWay"/>
+							</MultiBinding>
+						</Grid.IsVisible>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition/>
+							<ColumnDefinition/>
+						</Grid.ColumnDefinitions>
+
+						<TextBlock Grid.Column="0" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding ProbabilityDensityGraphFilePath}"/>
+						<Button Grid.Column="1" Content="Clear" Margin="5 0 0 0" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding UnselectProbabilityDensityGraphFileCommand}"/>
+					</Grid>
+					
+					<Grid>
+						<Button.IsVisible>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="IsProbabilityDensityGraphNeeded" Mode="TwoWay"/>
+								<Binding Path="!IsProbabilityDensityGraphFileSelected" Mode="TwoWay"/>
+							</MultiBinding>
+						</Button.IsVisible>
+
+						<Button Grid.Row="2" Content="Select file" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding SelectProbabilityDensityGraphFileCommand}"/>
+					</Grid>
+				</StackPanel>
+
+				<StackPanel x:Name="ProbabilityDistributionGraphOptions">
+					<StackPanel Orientation="Horizontal">
+						<CheckBox x:Name="IsProbabilityDistributionGraphNeededCheckBox" IsChecked="{Binding IsProbabilityDistributionGraphNeeded}">
+							<TextBlock Text="Probability distribution graph" TextWrapping="Wrap"/>
+						</CheckBox>
+						<Button x:Name="ChangeProbabilityDistributionGraphColorButton" BorderThickness="0" IsVisible="{Binding ElementName=IsProbabilityDistributionGraphNeededCheckBox, Path=IsChecked}" Command="{Binding ChangeProbabilityDistributionGraphColorCommand}" Width="25" Margin="5 0 0 0" Background="{Binding Path=ProbabilityDistributionGraphColor, Converter={StaticResource colorToBrushConverter}, Mode=TwoWay}"/>
+					</StackPanel>
+					<Grid Grid.Row="1" Grid.RowSpan="2">
+						<Grid.IsVisible>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="IsProbabilityDistributionGraphNeeded" Mode="TwoWay"/>
+								<Binding Path="IsProbabilityDistributionGraphFileSelected" Mode="TwoWay"/>
+							</MultiBinding>
+						</Grid.IsVisible>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition/>
+							<ColumnDefinition/>
+						</Grid.ColumnDefinitions>
+
+						<TextBlock Grid.Column="0" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding ProbabilityDistributionGraphFilePath}"/>
+						<Button Grid.Column="1" Content="Clear" Margin="5 0 0 0" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding UnselectProbabilityDistributionGraphFileCommand}"/>
+					</Grid>
+					
+					<Grid>
+						<Button.IsVisible>
+							<MultiBinding Converter="{x:Static BoolConverters.And}">
+								<Binding Path="IsProbabilityDistributionGraphNeeded" Mode="TwoWay"/>
+								<Binding Path="!IsProbabilityDistributionGraphFileSelected" Mode="TwoWay"/>
+							</MultiBinding>
+						</Button.IsVisible>
+						
+						<Button Grid.Row="2" Content="Select file" VerticalAlignment="Center" HorizontalAlignment="Center" IsVisible="{Binding IsProbabilityDistributionGraphNeeded}" Command="{Binding SelectProbabilityDistributionGraphFileCommand}"/>
+					</Grid>
+				</StackPanel>
+
+				<Popup Width="400" Height="200" IsOpen="{Binding IsFrameTimingGraphChangingColor, Mode=TwoWay}" PlacementTarget="{Binding ElementName=ChangeFrameTimingGraphColorButton}">
 					<cp:ColorPicker Color="{Binding FrameTimingGraphColor, Mode=TwoWay}"/>
 				</Popup>
 
-				<Popup Width="400" Height="200" IsOpen="{Binding IsProbabilityDensityChangingColor}" PlacementTarget="{Binding ElementName=ChangeProbabilityDensityGraphColorButton}">
+				<Popup Width="400" Height="200" IsOpen="{Binding IsProbabilityDensityChangingColor, Mode=TwoWay}" PlacementTarget="{Binding ElementName=ChangeProbabilityDensityGraphColorButton}">
 					<cp:ColorPicker Color="{Binding ProbabilityDensityGraphColor, Mode=TwoWay}"/>
 				</Popup>
 
-				<Popup Width="400" Height="200" IsOpen="{Binding IsProbabilityDistributionGraphChangingColor}" PlacementTarget="{Binding ElementName=ChangeProbabilityDistributionGraphColorButton}">
+				<Popup Width="400" Height="200" IsOpen="{Binding IsProbabilityDistributionGraphChangingColor, Mode=TwoWay}" PlacementTarget="{Binding ElementName=ChangeProbabilityDistributionGraphColorButton}">
 					<cp:ColorPicker Color="{Binding ProbabilityDistributionGraphColor, Mode=TwoWay}"/>
 				</Popup>
 				
 			</StackPanel>
-
-			<Grid VerticalAlignment="Bottom" HorizontalAlignment="Center" Grid.Row="2">
-				<Grid.RowDefinitions>
-					<RowDefinition/>
-					<RowDefinition/>
-					<RowDefinition/>
-				</Grid.RowDefinitions>
-
-				<TextBlock HorizontalAlignment="Center" Text="Graphs file:" FontWeight="Bold"/>
-
-				<Grid IsVisible="{Binding IsGraphsFileSelected}" Grid.Row="1" Grid.RowSpan="2">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition/>
-						<ColumnDefinition/>
-					</Grid.ColumnDefinitions>
-
-					<TextBlock Grid.Column="0" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding GraphsFilePath}"/>
-					<Button Grid.Column="1" Content="Clear" Margin="5 0 0 0" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding UnselectGraphsFileCommand}"/>
-				</Grid>
-
-				<Button Grid.Row="2" Content="Select file" VerticalAlignment="Center" HorizontalAlignment="Center" IsVisible="{Binding !IsGraphsFileSelected}" Command="{Binding SelectGraphsFileCommand}"/>
-			</Grid>
 		</Grid>
 
 		<Grid Grid.Row="1" Grid.Column="4" x:Name="OutputFileProgramTypeSelectGrid">

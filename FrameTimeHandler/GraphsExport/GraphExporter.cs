@@ -16,7 +16,7 @@ namespace FrameTimeHandler.GraphsExport
             public string OutputFile { get; set; }
             public string TestName { get; set; }
             public bool Append { get; set; }
-            public IEnumerable<(string graphName, string graphData, Color color)> Graphs { get; set; }
+            public (string graphName, string graphData, Color color) Graph { get; set; }
         }
 
         private static Dictionary<ProgramsThatReadOutput, Action<ExportData>> Savers =
@@ -60,38 +60,37 @@ namespace FrameTimeHandler.GraphsExport
                             iniFile.Add("Data:OleObjectCount", "0");
                         }
 
-                        foreach (var (graphName, graphData, color) in data.Graphs)
+                        var (graphName, graphData, color) = data.Graph;
+
+                        string nextPointSeries = iniFile.Keys
+                            .Select(x => x.Split(':')[0])
+                            .OrderByDescending(s => s)
+                            .FirstOrDefault(x => x.StartsWith("PointSeries"));
+
+                        if (string.IsNullOrEmpty(nextPointSeries))
                         {
-                            string nextPointSeries = iniFile.Keys
-                                .Select(x => x.Split(':')[0])
-                                .OrderByDescending(s => s)
-                                .FirstOrDefault(x => x.StartsWith("PointSeries"));
-
-                            if (string.IsNullOrEmpty(nextPointSeries))
-                            {
-                                nextPointSeries = "PointSeries1";
-                            }
-                            else
-                            {
-                                nextPointSeries = "PointSeries" + (int.Parse(nextPointSeries.Replace("PointSeries", "")) + 1);
-                            }
-
-                            Color withoutAlpha = Color.FromArgb(Byte.MinValue, color.R, color.G, color.B);
-
-                            iniFile.Add($"{nextPointSeries}:FillColor", withoutAlpha.ToString().ToUpper().Replace("#", "0x"));
-                            iniFile.Add($"{nextPointSeries}:LineColor", withoutAlpha.ToString().ToUpper().Replace("#", "0x"));
-                            iniFile.Add($"{nextPointSeries}:Size", "0");
-                            iniFile.Add($"{nextPointSeries}:Style", "0");
-                            iniFile.Add($"{nextPointSeries}:LineStyle", "0");
-                            iniFile.Add($"{nextPointSeries}:LabelPosition", "0");
-                            iniFile.Add($"{nextPointSeries}:Visible", "0");
-                            iniFile.Add($"{nextPointSeries}:LegendText", $"{data.TestName} {graphName}");
-
-                            (double, double)[] points = FTAnlzer.PythonTupleListParse(graphData).ToArray();
-
-                            iniFile.Add($"{nextPointSeries}:PointCount", $"{points.Length}");
-                            iniFile.Add($"{nextPointSeries}:Points", string.Join(';', points.Select(p => $"{p.Item1},{p.Item2}")));
+                            nextPointSeries = "PointSeries1";
                         }
+                        else
+                        {
+                            nextPointSeries = "PointSeries" + (int.Parse(nextPointSeries.Replace("PointSeries", "")) + 1);
+                        }
+
+                        Color withoutAlpha = Color.FromArgb(Byte.MinValue, color.R, color.G, color.B);
+
+                        iniFile.Add($"{nextPointSeries}:FillColor", withoutAlpha.ToString().ToUpper().Replace("#", "0x"));
+                        iniFile.Add($"{nextPointSeries}:LineColor", withoutAlpha.ToString().ToUpper().Replace("#", "0x"));
+                        iniFile.Add($"{nextPointSeries}:Size", "0");
+                        iniFile.Add($"{nextPointSeries}:Style", "0");
+                        iniFile.Add($"{nextPointSeries}:LineStyle", "0");
+                        iniFile.Add($"{nextPointSeries}:LabelPosition", "0");
+                        iniFile.Add($"{nextPointSeries}:Visible", "0");
+                        iniFile.Add($"{nextPointSeries}:LegendText", $"{data.TestName} {graphName}");
+
+                        (double, double)[] points = FTAnlzer.PythonTupleListParse(graphData).ToArray();
+
+                        iniFile.Add($"{nextPointSeries}:PointCount", $"{points.Length}");
+                        iniFile.Add($"{nextPointSeries}:Points", string.Join(';', points.Select(p => $"{p.Item1},{p.Item2}")));
 
                         using FileStream file = File.Open(data.OutputFile, FileMode.OpenOrCreate);
                         using StreamWriter fileWriter = new StreamWriter(file);
@@ -113,12 +112,12 @@ namespace FrameTimeHandler.GraphsExport
             };
 
         public static void Export(string outputFile, string testName, ProgramsThatReadOutput program, bool append,
-            IEnumerable<(string graphName, string graphData, Color color)> graphs)
+            (string graphName, string graphData, Color color) graph)
         {
             Savers[program](new ExportData()
             {
                 Append = append,
-                Graphs = graphs,
+                Graph = graph,
                 OutputFile = outputFile,
                 TestName = testName
             });

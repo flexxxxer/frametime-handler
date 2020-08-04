@@ -13,6 +13,7 @@ using DynamicData;
 using FrameTimeHandler.FTAnlzerInterop;
 using FrameTimeHandler.GraphsExport;
 using MessageBox.Avalonia;
+
 using Color = Avalonia.Media.Color;
 
 namespace FrameTimeHandler.ViewModels
@@ -35,47 +36,71 @@ namespace FrameTimeHandler.ViewModels
         }
         public bool IsFileSelected => string.IsNullOrEmpty(FilePath) is false;
 
-        private string _graphsFilePath = "";
-        public string GraphsFilePath
+        private string _frametimingGraphFilePath = "";
+        public string FrametimingGraphFilePath
         {
-            get => _graphsFilePath;
+            get => _frametimingGraphFilePath;
             set
             {
-                if (_graphsFilePath != value)
+                if (_frametimingGraphFilePath != value)
                 {
-                    _graphsFilePath = value;
-                    this.RaisePropertyChanged(nameof(GraphsFilePath));
-                    this.RaisePropertyChanged(nameof(IsGraphsFileSelected));
+                    _frametimingGraphFilePath = value;
+                    this.RaisePropertyChanged(nameof(FrametimingGraphFilePath));
+                    this.RaisePropertyChanged(nameof(IsFrametimingGraphFileSelected));
                 }
             }
         }
-        public bool IsGraphsFileSelected => string.IsNullOrEmpty(GraphsFilePath) is false;
+        public bool IsFrametimingGraphFileSelected => string.IsNullOrEmpty(FrametimingGraphFilePath) is false;
+
+        private string _probabilityDensityGraphFilePath = "";
+        public string ProbabilityDensityGraphFilePath
+        {
+            get => _probabilityDensityGraphFilePath;
+            set
+            {
+                if (_probabilityDensityGraphFilePath != value)
+                {
+                    _probabilityDensityGraphFilePath = value;
+                    this.RaisePropertyChanged(nameof(ProbabilityDensityGraphFilePath));
+                    this.RaisePropertyChanged(nameof(IsProbabilityDensityGraphFileSelected));
+                }
+            }
+        }
+        public bool IsProbabilityDensityGraphFileSelected => string.IsNullOrEmpty(ProbabilityDensityGraphFilePath) is false;
+
+        private string _probabilityDistributionGraphFilePath = "";
+        public string ProbabilityDistributionGraphFilePath
+        {
+            get => _probabilityDistributionGraphFilePath;
+            set
+            {
+                if (_probabilityDistributionGraphFilePath != value)
+                {
+                    _probabilityDistributionGraphFilePath = value;
+                    this.RaisePropertyChanged(nameof(ProbabilityDistributionGraphFilePath));
+                    this.RaisePropertyChanged(nameof(IsProbabilityDistributionGraphFileSelected));
+                }
+            }
+        }
+        public bool IsProbabilityDistributionGraphFileSelected => string.IsNullOrEmpty(ProbabilityDistributionGraphFilePath) is false;
 
         public ReactiveCommand<Unit, Unit> SelectFileCommand { get; }
         public ReactiveCommand<Unit, Unit> UnselectFileCommand { get; }
-        public ReactiveCommand<Unit, Unit> SelectGraphsFileCommand { get; }
-        public ReactiveCommand<Unit, Unit> UnselectGraphsFileCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> SelectFrametimingGraphFileCommand { get; }
+        public ReactiveCommand<Unit, Unit> UnselectFrametimingGraphFileCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> SelectProbabilityDensityGraphFileCommand { get; }
+        public ReactiveCommand<Unit, Unit> UnselectProbabilityDensityGraphFileCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> SelectProbabilityDistributionGraphFileCommand { get; }
+        public ReactiveCommand<Unit, Unit> UnselectProbabilityDistributionGraphFileCommand { get; }
+
         public ReactiveCommand<Unit, Unit> SaveGraphsCommand { get; }
 
         public ReactiveCommand<Unit, Unit> ChangeFrameTimingGraphColorCommand { get; }
         public ReactiveCommand<Unit, Unit> ChangeProbabilityDensityGraphColorCommand { get; }
         public ReactiveCommand<Unit, Unit> ChangeProbabilityDistributionGraphColorCommand { get; }
-
-        public ObservableCollection<string> LogCreationPrograms { get; set; } = new ObservableCollection<string>();
-
-        private string _selectedProgram = "";
-        public string SelectedProgram
-        {
-            get => _selectedProgram;
-            set
-            {
-                if (_selectedProgram != value)
-                {
-                    _selectedProgram = value;
-                    this.RaisePropertyChanged(nameof(SelectedProgram));
-                }
-            }
-        }
 
         private ProgramsThatReadOutput _programThatReadOutput;
         public ProgramsThatReadOutput ProgramThatReadOutput
@@ -87,6 +112,64 @@ namespace FrameTimeHandler.ViewModels
                 {
                     _programThatReadOutput = value;
                     this.RaisePropertyChanged(nameof(ProgramThatReadOutput));
+                }
+            }
+        }
+
+        public ObservableCollection<string> LogCreationPrograms { get; set; } = new ObservableCollection<string>();
+
+        private string _selectedProgram = "";
+        public string SelectedProgram
+        {
+            get => _selectedProgram;
+            set
+            {
+                if (_selectedProgram != value)
+                {
+                    if (this.IsFileSelected)
+                    {
+                        var statistics = FTAnlzer.GetStatistics(this.FilePath, value);
+                        
+                        if (string.IsNullOrEmpty(statistics.error))
+                        {
+                            this.Statistics = statistics.stat;
+                            this.IsSelectedProgramCorrect = true;
+                        }
+                        else
+                        {
+                            this.IsSelectedProgramCorrect = false;
+                        }
+                    }
+                    _selectedProgram = value;
+                    this.RaisePropertyChanged(nameof(SelectedProgram));
+                }
+            }
+        }
+
+        private bool _isSelectedProgramCorrect;
+        public bool IsSelectedProgramCorrect
+        {
+            get => _isSelectedProgramCorrect;
+            set
+            {
+                if (_isSelectedProgramCorrect != value)
+                {
+                    _isSelectedProgramCorrect = value;
+                    this.RaisePropertyChanged(nameof(IsSelectedProgramCorrect));
+                }
+            }
+        }
+
+        private FTStat _statistics = new FTStat();
+        public FTStat Statistics
+        {
+            get => _statistics;
+            set
+            {
+                if (_statistics != value)
+                {
+                    _statistics = value;
+                    this.RaisePropertyChanged(nameof(Statistics));
                 }
             }
         }
@@ -258,13 +341,13 @@ namespace FrameTimeHandler.ViewModels
             {
                 IEnumerable<Color> NeededColors()
                 {
-                    if (IsFrametimingGraphNeeded)
+                    if (IsFrametimingGraphFileSelected)
                         yield return FrameTimingGraphColor;
 
-                    if (IsProbabilityDensityGraphNeeded)
+                    if (IsProbabilityDensityGraphFileSelected)
                         yield return ProbabilityDensityGraphColor;
 
-                    if (IsProbabilityDistributionGraphNeeded)
+                    if (IsProbabilityDistributionGraphFileSelected)
                         yield return ProbabilityDistributionGraphColor;
                 }
 
@@ -279,7 +362,6 @@ namespace FrameTimeHandler.ViewModels
                 var fileDialog = new OpenFileDialog()
                 {
                     AllowMultiple = false,
-                    Directory = Directory.GetCurrentDirectory()
                 };
 
                 string[] results = await fileDialog.ShowAsync((Application.Current.ApplicationLifetime as ClassicDesktopStyleApplicationLifetime)?.MainWindow);
@@ -296,7 +378,7 @@ namespace FrameTimeHandler.ViewModels
                 this.FilePath = "";
             });
 
-            SelectGraphsFileCommand = ReactiveCommand.CreateFromTask(async () =>
+            SelectFrametimingGraphFileCommand = ReactiveCommand.CreateFromTask(async () =>
             {
                 var fileDialog = new OpenFileDialog()
                 {
@@ -305,7 +387,7 @@ namespace FrameTimeHandler.ViewModels
 
                 string[] results = await fileDialog.ShowAsync((Application.Current.ApplicationLifetime as ClassicDesktopStyleApplicationLifetime)?.MainWindow);
 
-                if (results is null)
+                if (results is null || results.Length == 0)
                 {
                     return;
                 }
@@ -314,29 +396,81 @@ namespace FrameTimeHandler.ViewModels
 
                 if (!string.IsNullOrEmpty(selectedFile))
                 {
-                    this.GraphsFilePath = selectedFile;
+                    this.FrametimingGraphFilePath = selectedFile;
                 }
             });
-            UnselectGraphsFileCommand = ReactiveCommand.Create(() =>
+            UnselectFrametimingGraphFileCommand = ReactiveCommand.Create(() =>
             {
-                this.GraphsFilePath = "";
+                this.FrametimingGraphFilePath = "";
+            });
+
+            SelectProbabilityDensityGraphFileCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                var fileDialog = new OpenFileDialog()
+                {
+                    AllowMultiple = false,
+                };
+
+                string[] results = await fileDialog.ShowAsync((Application.Current.ApplicationLifetime as ClassicDesktopStyleApplicationLifetime)?.MainWindow);
+
+                if (results is null || results.Length == 0)
+                {
+                    return;
+                }
+
+                string selectedFile = results.FirstOrDefault(r => string.IsNullOrEmpty(r) is false);
+
+                if (!string.IsNullOrEmpty(selectedFile))
+                {
+                    this.ProbabilityDensityGraphFilePath = selectedFile;
+                }
+            });
+            UnselectProbabilityDensityGraphFileCommand = ReactiveCommand.Create(() =>
+            {
+                this.ProbabilityDensityGraphFilePath = "";
+            });
+
+            SelectProbabilityDistributionGraphFileCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                var fileDialog = new OpenFileDialog()
+                {
+                    AllowMultiple = false,
+                };
+
+                string[] results = await fileDialog.ShowAsync((Application.Current.ApplicationLifetime as ClassicDesktopStyleApplicationLifetime)?.MainWindow);
+
+                if (results is null || results.Length == 0)
+                {
+                    return;
+                }
+
+                string selectedFile = results.FirstOrDefault(r => string.IsNullOrEmpty(r) is false);
+
+                if (!string.IsNullOrEmpty(selectedFile))
+                {
+                    this.ProbabilityDistributionGraphFilePath = selectedFile;
+                }
+            });
+            UnselectProbabilityDistributionGraphFileCommand = ReactiveCommand.Create(() =>
+            {
+                this.ProbabilityDistributionGraphFilePath = "";
             });
 
             SaveGraphsCommand = ReactiveCommand.Create(() =>
             {
-                IEnumerable<(GraphTypes graphType, Color color)> NeededGraphs()
+                IEnumerable<(GraphTypes graphType, Color color, string path)> NeededGraphs()
                 {
-                    if (IsFrametimingGraphNeeded)
-                        yield return (GraphTypes.FrameTiming, FrameTimingGraphColor);
+                    if (IsFrametimingGraphFileSelected)
+                        yield return (GraphTypes.FrameTiming, FrameTimingGraphColor, this.FrametimingGraphFilePath);
 
-                    if (IsProbabilityDensityGraphNeeded)
-                        yield return (GraphTypes.ProbabilityDensity, ProbabilityDensityGraphColor);
+                    if (IsProbabilityDensityGraphFileSelected)
+                        yield return (GraphTypes.ProbabilityDensity, ProbabilityDensityGraphColor, this.ProbabilityDensityGraphFilePath);
 
-                    if (IsProbabilityDistributionGraphNeeded)
-                        yield return (GraphTypes.ProbabilityDistribution, ProbabilityDistributionGraphColor);
+                    if (IsProbabilityDistributionGraphFileSelected)
+                        yield return (GraphTypes.ProbabilityDistribution, ProbabilityDistributionGraphColor, this.ProbabilityDistributionGraphFilePath);
                 }
 
-                var (graphData, error) = FTAnlzer.GetGraphsData(FilePath, SelectedProgram, NeededGraphs());
+                var (graphData, error) = FTAnlzer.GetGraphsData(FilePath, SelectedProgram, NeededGraphs().Select(i => (i.graphType, i.color)));
 
                 if (!string.IsNullOrEmpty(error))
                 {
@@ -349,23 +483,27 @@ namespace FrameTimeHandler.ViewModels
                     return;
                 }
 
-                GraphExporter.Export(GraphsFilePath, TestName, ProgramThatReadOutput, IsAppend, graphData);
+                var graphDataAsArray = graphData.ToArray();
+                int i = 0;
 
+                foreach (var (_, _, path) in NeededGraphs())
+                {
+                    GraphExporter.Export(path, TestName, ProgramThatReadOutput, IsAppend, graphDataAsArray[i]);
+                }
             }, this.WhenAnyValue(
                 vm => vm.IsFileSelected, 
-                vm => vm.IsGraphsFileSelected, 
                 vm => vm.SelectedProgram, 
+                vm => vm.IsFrametimingGraphFileSelected, 
+                vm => vm.IsProbabilityDensityGraphFileSelected, 
+                vm => vm.IsProbabilityDistributionGraphFileSelected, 
                 vm => vm.ProgramThatReadOutput,
-                vm => vm.IsFrametimingGraphNeeded,
-                vm => vm.IsProbabilityDensityGraphNeeded, 
-                vm => vm.IsProbabilityDistributionGraphNeeded,
                 vm => vm.TestName,
                 vm => vm.IsNeededGraphsColorsUnique,
-                (isFileSelected, isGraphsFileSelected, selectedProgram, programThatReadOutput, isFrametimingGraphNeeded, isProbabilityDensityGraphNeeded, isProbabilityDistributionGraphNeeded, testName, isNeededGraphsColorsUnique) 
-                    => isFileSelected && isGraphsFileSelected
+                (isFileSelected, selectedProgram, isFrametimingGraphFileSelected, isProbabilityDensityGraphFileSelected, isProbabilityDistributionGraphFileSelected, programThatReadOutput, testName, isNeededGraphsColorsUnique) 
+                    => isFileSelected
                        && !string.IsNullOrEmpty(selectedProgram) 
                        && programThatReadOutput != ProgramsThatReadOutput.None 
-                       && (isFrametimingGraphNeeded || isProbabilityDensityGraphNeeded || isProbabilityDistributionGraphNeeded)
+                       && (isFrametimingGraphFileSelected || isProbabilityDensityGraphFileSelected || isProbabilityDistributionGraphFileSelected)
                        && isNeededGraphsColorsUnique
                        && !string.IsNullOrEmpty(testName)));
 

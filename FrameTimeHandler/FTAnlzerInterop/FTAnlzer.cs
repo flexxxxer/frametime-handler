@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Avalonia.Media;
+
+using JetBrains.Annotations;
+
 using Microsoft.Extensions.Configuration.Ini;
 using PythonInterop;
 
@@ -92,5 +95,39 @@ namespace FrameTimeHandler.FTAnlzerInterop
             {GraphTypes.ProbabilityDensity, "probability density graph"},
             {GraphTypes.ProbabilityDistribution, "probability distribution graph"},
         };
+
+        [CanBeNull]
+        public static (FTStat stat, string error) GetStatistics(string filepath, string programName)
+        {
+            PythonEngine engine = new PythonEngine(Interpreter.Value);
+
+            ExecutionResult result = engine.Execute(Directory.GetCurrentDirectory() + "/ftanlzer/ftanlzer.py", "-f", filepath, "-p", programName);
+
+            if (result.StdError.Replace(@"\r\n", "").Length != 0)
+            {
+                return (null, result.StdError);
+            }
+
+            var parser = new IniStreamConfigurationProvider(new IniStreamConfigurationSource());
+
+            parser.Load(new MemoryStream(Encoding.ASCII.GetBytes(result.StdOut.Replace(@"\r\n", ""))));
+
+            parser.TryGet("frame times:0.1%", out string occasion01);
+            parser.TryGet("frame times:1%", out string occasion1);
+            parser.TryGet("frame times:5%", out string occasion5);
+            parser.TryGet("frame times:50%", out string occasion50);
+            parser.TryGet("statistics:avg", out string avg);
+
+            FTStat stat = new FTStat()
+            {
+                Occasion01 = double.Parse(occasion01),
+                Occasion1 = double.Parse(occasion1),
+                Occasion5 = double.Parse(occasion5),
+                Occasion50 = double.Parse(occasion50),
+                Avg = double.Parse(avg),
+            };
+
+            return (stat, "");
+        }
     }
 }

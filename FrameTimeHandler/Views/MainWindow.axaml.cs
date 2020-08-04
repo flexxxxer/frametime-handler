@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using FrameTimeHandler.ViewModels;
 
 namespace FrameTimeHandler.Views
 {
@@ -12,6 +13,12 @@ namespace FrameTimeHandler.Views
 #if DEBUG
             this.AttachDevTools();
 #endif
+
+            this.Deactivated += (sender, args) =>
+            {
+                var vm = this.DataContext as MainWindowViewModel;
+                vm.IsFrameTimingGraphChangingColor = vm.IsProbabilityDensityChangingColor = vm.IsProbabilityDistributionGraphChangingColor = false;
+            };
         }
 
         private void InitializeComponent()

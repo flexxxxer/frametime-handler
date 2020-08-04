@@ -31,6 +31,18 @@ namespace FrameTimeHandler.ViewModels
                     _filePath = value;
                     this.RaisePropertyChanged(nameof(FilePath));
                     this.RaisePropertyChanged(nameof(IsFileSelected));
+
+                    var (stat, error) = FTAnlzer.GetStatistics(this.FilePath, this.SelectedProgram);
+
+                    if (string.IsNullOrEmpty(error))
+                    {
+                        this.Statistics = stat;
+                        this.IsSelectedProgramCorrect = true;
+                    }
+                    else
+                    {
+                        this.IsSelectedProgramCorrect = false;
+                    }
                 }
             }
         }
@@ -126,22 +138,23 @@ namespace FrameTimeHandler.ViewModels
             {
                 if (_selectedProgram != value)
                 {
-                    if (this.IsFileSelected)
-                    {
-                        var statistics = FTAnlzer.GetStatistics(this.FilePath, value);
-                        
-                        if (string.IsNullOrEmpty(statistics.error))
-                        {
-                            this.Statistics = statistics.stat;
-                            this.IsSelectedProgramCorrect = true;
-                        }
-                        else
-                        {
-                            this.IsSelectedProgramCorrect = false;
-                        }
-                    }
                     _selectedProgram = value;
                     this.RaisePropertyChanged(nameof(SelectedProgram));
+
+                    if(!this.IsFileSelected)
+                        return;
+
+                    var (stat, error) = FTAnlzer.GetStatistics(this.FilePath, value);
+
+                    if (string.IsNullOrEmpty(error))
+                    {
+                        this.Statistics = stat;
+                        this.IsSelectedProgramCorrect = true;
+                    }
+                    else
+                    {
+                        this.IsSelectedProgramCorrect = false;
+                    }
                 }
             }
         }
@@ -320,7 +333,7 @@ namespace FrameTimeHandler.ViewModels
             }
         }
 
-        private bool _isAppend = false;
+        private bool _isAppend = true;
 
         public bool IsAppend
         {
@@ -488,7 +501,7 @@ namespace FrameTimeHandler.ViewModels
 
                 foreach (var (_, _, path) in NeededGraphs())
                 {
-                    GraphExporter.Export(path, TestName, ProgramThatReadOutput, IsAppend, graphDataAsArray[i]);
+                    GraphExporter.Export(path, TestName, ProgramThatReadOutput, IsAppend, graphDataAsArray[i++]);
                 }
             }, this.WhenAnyValue(
                 vm => vm.IsFileSelected, 

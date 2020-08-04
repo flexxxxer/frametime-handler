@@ -101,7 +101,7 @@ namespace FrameTimeHandler.FTAnlzerInterop
         {
             PythonEngine engine = new PythonEngine(Interpreter.Value);
 
-            ExecutionResult result = engine.Execute(Directory.GetCurrentDirectory() + "/ftanlzer/ftanlzer.py", "-f", filepath, "-p", programName);
+            ExecutionResult result = engine.Execute(Directory.GetCurrentDirectory() + "/ftanlzer/ftanlzer.py", "-f", filepath, "-p", programName, "--stat");
 
             if (result.StdError.Replace(@"\r\n", "").Length != 0)
             {
@@ -120,11 +120,11 @@ namespace FrameTimeHandler.FTAnlzerInterop
 
             FTStat stat = new FTStat()
             {
-                Occasion01 = double.Parse(occasion01),
-                Occasion1 = double.Parse(occasion1),
-                Occasion5 = double.Parse(occasion5),
-                Occasion50 = double.Parse(occasion50),
-                Avg = double.Parse(avg),
+                Occasion01 = Math.Round(double.Parse(occasion01), 2),
+                Occasion1 = Math.Round(double.Parse(occasion1), 2),
+                Occasion5 = Math.Round(double.Parse(occasion5), 2),
+                Occasion50 = Math.Round(double.Parse(occasion50), 2),
+                Avg = Math.Round(double.Parse(avg), 2),
             };
 
             return (stat, "");

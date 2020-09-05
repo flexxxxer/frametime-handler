@@ -128,6 +128,8 @@ namespace FrameTimeHandler.ViewModels
             }
         }
 
+        public ReactiveCommand<Unit, Unit> CopyStatToClipboardCommand { get; }
+
         public ObservableCollection<string> LogCreationPrograms { get; set; } = new ObservableCollection<string>();
 
         private string _selectedProgram = "";
@@ -370,6 +372,20 @@ namespace FrameTimeHandler.ViewModels
 
         public MainWindowViewModel()
         {
+            CopyStatToClipboardCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                if (this.IsSelectedProgramCorrect)
+                {
+                    string statView = $"0.1%: {this.Statistics.Occasion01}" + Environment.NewLine +
+                                      $"1%: {this.Statistics.Occasion1}" + Environment.NewLine +
+                                      $"5%: {this.Statistics.Occasion5}" + Environment.NewLine +
+                                      $"50%: {this.Statistics.Occasion50}" + Environment.NewLine +
+                                      $"Avg: {this.Statistics.Avg}" + Environment.NewLine;
+
+                    await TextCopy.ClipboardService.SetTextAsync(statView);
+                }
+            });
+
             SelectFileCommand = ReactiveCommand.CreateFromTask(async () =>
             {
                 var fileDialog = new OpenFileDialog()

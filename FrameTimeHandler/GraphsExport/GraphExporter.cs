@@ -64,27 +64,32 @@ namespace FrameTimeHandler.GraphsExport
 
                         string nextPointSeries = iniFile.Keys
                             .Select(x => x.Split(':')[0])
-                            .OrderByDescending(s => s)
-                            .FirstOrDefault(x => x.StartsWith("PointSeries"));
+                            .Where(x => x.StartsWith("PointSeries"))
+                            .Select(x => x.Replace("PointSeries", ""))
+                            .Select(s => int.Parse(s))
+                            .OrderByDescending(v => v)
+                            .FirstOrDefault()
+                            .ToString();
 
-                        if (string.IsNullOrEmpty(nextPointSeries))
+                        if (nextPointSeries == "0")
                         {
                             nextPointSeries = "PointSeries1";
                         }
                         else
                         {
-                            nextPointSeries = "PointSeries" + (int.Parse(nextPointSeries.Replace("PointSeries", "")) + 1);
+                            nextPointSeries = "PointSeries" + (int.Parse(nextPointSeries) + 1);
                         }
 
                         Color withoutAlpha = Color.FromArgb(Byte.MinValue, color.R, color.G, color.B);
 
-                        iniFile.Add($"{nextPointSeries}:FillColor", withoutAlpha.ToString().ToUpper().Replace("#", "0x"));
-                        iniFile.Add($"{nextPointSeries}:LineColor", withoutAlpha.ToString().ToUpper().Replace("#", "0x"));
-                        iniFile.Add($"{nextPointSeries}:Size", "0");
-                        iniFile.Add($"{nextPointSeries}:Style", "0");
-                        iniFile.Add($"{nextPointSeries}:LineStyle", "0");
-                        iniFile.Add($"{nextPointSeries}:LabelPosition", "0");
-                        iniFile.Add($"{nextPointSeries}:Visible", "0");
+                        iniFile[$"{nextPointSeries}:FillColor"] = withoutAlpha.ToString().ToUpper().Replace("#", "0x");
+                        iniFile[$"{nextPointSeries}:LineColor"] = withoutAlpha.ToString().ToUpper().Replace("#", "0x");
+                        iniFile[$"{nextPointSeries}:Size"] = "0";
+                        iniFile[$"{nextPointSeries}:Style"] = "0";
+                        iniFile[$"{nextPointSeries}:LineStyle"] = "0";
+                        iniFile[$"{nextPointSeries}:LabelPosition"] = "0";
+                        iniFile[$"{nextPointSeries}:Visible"] = "0";
+
                         iniFile.Add($"{nextPointSeries}:LegendText", $"{data.TestName} {graphName}");
 
                         (double, double)[] points = FTAnlzer.PythonTupleListParse(graphData).ToArray();

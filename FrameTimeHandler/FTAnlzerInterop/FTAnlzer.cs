@@ -34,7 +34,7 @@ namespace FrameTimeHandler.FTAnlzerInterop
         public static (IEnumerable<(string graphName, string graphData, Color color)> info, string error) GetGraphsData(string filePath, string program, IEnumerable<(GraphTypes graphType, Color color)> graphs)
         {
             var graphsCopy = graphs as (GraphTypes graphType, Color color)[] ?? graphs.ToArray(); // multiple enumeration maybe
-            string args = $"-f {filePath} -p {program} {string.Join(' ', graphsCopy.Select(x => GraphRepresentations[x.graphType]))}";
+            string args = $"-f \"{filePath}\" -p {program} {string.Join(' ', graphsCopy.Select(x => GraphRepresentations[x.graphType]))}";
 
             PythonEngine engine = new PythonEngine(Interpreter.Value);
             ExecutionResult result = engine.Execute(Directory.GetCurrentDirectory() + "/ftanlzer/ftanlzer.py", args);
@@ -101,7 +101,7 @@ namespace FrameTimeHandler.FTAnlzerInterop
         {
             PythonEngine engine = new PythonEngine(Interpreter.Value);
 
-            ExecutionResult result = engine.Execute(Directory.GetCurrentDirectory() + "/ftanlzer/ftanlzer.py", "-f", filepath, "-p", programName, "--stat");
+            ExecutionResult result = engine.Execute(Directory.GetCurrentDirectory() + "/ftanlzer/ftanlzer.py", "-f", $"\"{filepath}\"", "-p", programName, "--stat");
 
             if (result.StdError.Replace(@"\r\n", "").Length != 0)
             {

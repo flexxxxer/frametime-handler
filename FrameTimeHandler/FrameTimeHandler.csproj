@@ -4,7 +4,7 @@
 		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<InvariantGlobalization>true</InvariantGlobalization>
 		<ApplicationIcon>Assets\fth-logo.ico</ApplicationIcon>
-		<Version>0.1</Version>
+		<Version>0.2</Version>
 		<Description>frame time graph creation tool</Description>
 		<PackageProjectUrl>https://github.com/FlexxxerAlex/frametime-handler</PackageProjectUrl>
 		<PackageIcon>fth-logo.ico</PackageIcon>
@@ -13,11 +13,12 @@
 		<AvaloniaResource Include="Assets\**" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Avalonia" Version="0.9.11" />
-		<PackageReference Include="Avalonia.Desktop" Version="0.9.11" />
-		<PackageReference Include="Avalonia.ReactiveUI" Version="0.9.11" />
+		<PackageReference Include="Avalonia" Version="0.9.12" />
+		<PackageReference Include="Avalonia.Desktop" Version="0.9.12" />
+		<PackageReference Include="Avalonia.ReactiveUI" Version="0.9.12" />
 		<PackageReference Include="MessageBox.Avalonia" Version="0.9.6.1" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="3.1.6" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="3.1.7" />
+		<PackageReference Include="TextCopy" Version="4.2.0" />
 		<PackageReference Include="ThemeEditor.Controls.ColorPicker" Version="0.9.4" />
 		<PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="1.68.0" />
 		<PackageReference Include="Avalonia.Skia.Linux.Natives" Version="1.68.0.2" ExcludeAssets="all" />
